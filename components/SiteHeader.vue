@@ -17,9 +17,6 @@ const links = [
   { id: 'contact', label: 'Contact' }
 ]
 
-const onHome = computed(() => route.path === '/')
-const href = (id: string) => (onHome.value ? `#${id}` : `/#${id}`)
-
 function onScroll() {
   scrolled.value = window.scrollY > 10
 }
@@ -76,10 +73,10 @@ watch(() => route.fullPath, () => (open.value = false))
 
       <!-- Sits right on desktop; the rail carries the identity on the left. -->
       <nav class="ml-auto hidden items-center gap-1 lg:flex" aria-label="Primary">
-        <a
+        <NuxtLink
           v-for="link in links"
           :key="link.id"
-          :href="href(link.id)"
+          :to="`/#${link.id}`"
           class="relative px-3.5 py-2 text-sm transition-colors duration-300"
           :class="active === link.id ? 'text-accent-400' : 'text-ice-dim hover:text-ice'"
           :aria-current="active === link.id ? 'true' : undefined"
@@ -91,7 +88,7 @@ watch(() => route.fullPath, () => (open.value = false))
             :class="active === link.id ? 'scale-x-100' : 'scale-x-0'"
             aria-hidden="true"
           />
-        </a>
+        </NuxtLink>
       </nav>
 
       <button
@@ -114,10 +111,10 @@ watch(() => route.fullPath, () => (open.value = false))
       class="fixed inset-0 z-[65] flex flex-col bg-ink-950/98 lg:hidden"
     >
       <nav class="shell flex flex-1 flex-col justify-center backdrop-blur-xl gap-2 py-24" aria-label="Mobile">
-        <a
+        <NuxtLink
           v-for="(link, i) in links"
           :key="link.id"
-          :href="href(link.id)"
+          :to="`/#${link.id}`"
           class="group flex items-center justify-between rounded-card border border-[var(--line)]
             bg-ink-850/60 px-5 py-4 transition-colors duration-300 hover:border-accent-500/45"
           :class="open ? 'rise' : ''"
@@ -135,7 +132,7 @@ watch(() => route.fullPath, () => (open.value = false))
             :size="16"
             class="text-ice-faint transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
           />
-        </a>
+        </NuxtLink>
 
         <a
           :href="`mailto:${site.email}`"

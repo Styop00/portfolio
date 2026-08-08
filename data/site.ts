@@ -1,7 +1,9 @@
 export const site = {
   name: 'Stepan Hambardzumyan',
   title: 'Full-Stack Developer',
-  url: 'https://styop00.github.io',
+  // Includes the /portfolio subpath the site is actually deployed under
+  // (a GitHub Pages project site, not a root Styop00.github.io user site).
+  url: 'https://styop00.github.io/portfolio',
   location: 'Yerevan, Armenia',
   tagline:
     'I build scalable web platforms end to end — Laravel and Node on the back, Vue, Nuxt and Next on the front, and the CI/CD that ships them.',

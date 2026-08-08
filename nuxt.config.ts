@@ -14,17 +14,35 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   site: {
+    // No path here: nuxt-site-config appends `app.baseURL` itself when
+    // building sitemap/canonical URLs. Including '/portfolio' here as well
+    // double-prefixes every generated URL to '/portfolio/portfolio/...'.
     url: 'https://styop00.github.io',
     name: 'Stepan Hambardzumyan — Full-Stack Developer'
   },
 
+  robots: {
+    // The module refuses to generate a robots.txt at all when `baseURL` is
+    // set, and rightly so: a project site's robots.txt would live at
+    // /portfolio/robots.txt, but crawlers only ever check the domain root
+    // (/robots.txt), which this repo doesn't control on the shared
+    // *.github.io domain. Generating one here would be silently ignored.
+    robotsTxt: false
+  },
+
   app: {
+    // Repo is a GitHub Pages *project* site (styop00.github.io/portfolio/),
+    // not a root `Styop00.github.io` user site — every asset URL needs this
+    // prefix or it 404s once deployed under the subpath.
     baseURL: '/portfolio/',
     head: {
       htmlAttrs: { lang: 'en' },
+      // Hardcoded absolute paths — unlike Nuxt's own emitted assets — are
+      // never rewritten with `baseURL`, so they 404 under the `/portfolio/`
+      // subpath unless prefixed here explicitly.
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/portfolio/favicon.svg' },
+        { rel: 'apple-touch-icon', href: '/portfolio/apple-touch-icon.png' }
       ],
       meta: [
         { name: 'theme-color', content: '#05050a' },
@@ -69,33 +87,21 @@ export default defineNuxtConfig({
     '/**': { prerender: true }
   },
 
-  features: {
-    // No third-party CSS-in-JS or inline style deps — keeps the CSP-friendly output small.
-    inlineStyles: true
-  },
-
   experimental: {
     payloadExtraction: false
   },
 
-  hooks: {
-    /**
-     * Drop the `modulepreload`/`prefetch` hints Nuxt emits into <head>.
-     * The pages are fully prerendered, so nothing above the fold needs JS —
-     * but the hints make the browser pull the whole bundle at high priority,
-     * which competes with the document and fonts and pushes First Contentful
-     * Paint out by ~0.7s on a throttled mobile connection. The entry script
-     * still loads from its normal <script type="module"> tag, just after paint.
-     */
-    'build:manifest': (manifest) => {
-      for (const entry of Object.values(manifest)) {
-        entry.preload = false
-        entry.prefetch = false
-      }
-    }
-  },
-
   typescript: {
     strict: true
+  },
+
+  features: {
+    // Omitting this key leaves Nuxt on its function-shaped default,
+    // `(id) => id.includes('.vue')` — which only inlines Vue SFC <style>
+    // blocks and does NOT reliably fall back to a linked stylesheet for
+    // global CSS (like this project's `assets/css/main.css`) under static
+    // generation. Explicit `false` is required to get a normal
+    // `<link rel="stylesheet">` for the compiled Tailwind CSS at all.
+    inlineStyles: false
   }
 })
